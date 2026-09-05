@@ -295,12 +295,23 @@ class ArrowsGame {
 
   loadLevel(index) {
     this.mode = 'campaign';
-    this.currentLevelIndex = Math.max(0, Math.min(window.CAMPAIGN_LEVELS.length - 1, index));
+    this.currentLevelIndex = Math.max(0, index);
     this.progress.lastLevelIndex = this.currentLevelIndex;
     this.saveProgress();
 
-    const levelData = window.CAMPAIGN_LEVELS[this.currentLevelIndex];
-    this.modeSubtitle.textContent = `CAMPAIGN — ${levelData.title.toUpperCase()}`;
+    window.EXTENDED_LEVELS = window.EXTENDED_LEVELS || {};
+    let levelData;
+    if (this.currentLevelIndex < window.CAMPAIGN_LEVELS.length) {
+      levelData = window.CAMPAIGN_LEVELS[this.currentLevelIndex];
+    } else {
+      if (!window.EXTENDED_LEVELS[this.currentLevelIndex]) {
+        window.EXTENDED_LEVELS[this.currentLevelIndex] = window.LevelGenerator.generateCampaignLevel(this.currentLevelIndex + 1);
+      }
+      levelData = window.EXTENDED_LEVELS[this.currentLevelIndex];
+    }
+
+    const titleText = levelData && levelData.title ? levelData.title.toUpperCase() : `STAGE ${this.currentLevelIndex + 1}`;
+    this.modeSubtitle.textContent = `CAMPAIGN — ${titleText}`;
     this.hudLevel.textContent = String(this.currentLevelIndex + 1).padStart(2, '0');
 
     this.setupBoard(levelData.gridSize, levelData.layout);
@@ -472,6 +483,11 @@ class ArrowsGame {
 
   handleArrowClick(r, c) {
     if (this.isLevelComplete) return;
+
+    if (window.soundEngine && window.soundEngine.ctx && window.soundEngine.ctx.state === 'suspended') {
+      window.soundEngine.ctx.resume().catch(() => {});
+    }
+
     const dir = this.grid[r][c];
     if (!dir) return;
 
@@ -792,8 +808,9 @@ class ArrowsGame {
     const unlocked = this.progress.unlockedLevel || 0;
     let totalStars = 0;
     let completedCount = 0;
+    const totalLevelsToShow = Math.max(window.CAMPAIGN_LEVELS.length, unlocked + 1);
 
-    window.CAMPAIGN_LEVELS.forEach((lvl, idx) => {
+    for (let idx = 0; idx < totalLevelsToShow; idx++) {
       const isLocked = idx > unlocked;
       const stars = this.progress.stars[idx] || 0;
       if (stars > 0) completedCount++;
@@ -822,7 +839,7 @@ class ArrowsGame {
       }
 
       gridContainer.appendChild(card);
-    });
+    }
 
     document.getElementById('totalStarsCount').textContent = totalStars;
     document.getElementById('completedLevelsCount').textContent = completedCount;
