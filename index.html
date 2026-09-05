@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ARROWS — Puzzle Escape</title>
+  <meta name="description" content="A sleek, satisfying directional logic puzzle game. Tap arrows to set them free without colliding into obstacles.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="obsidian">
+  <!-- Background Canvas for Ambient Motes and Particles -->
+  <canvas id="particleCanvas"></canvas>
+
+  <!-- App Wrapper -->
+  <div class="app-container">
+    <!-- Top Navigation / Header -->
+    <header class="app-header">
+      <div class="brand-group">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24" class="logo-icon" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1 class="brand-title">ARROWS</h1>
+          <span class="brand-subtitle" id="modeSubtitle">PUZZLE ESCAPE</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="btnSound" class="icon-btn" title="Toggle Sound" aria-label="Toggle Sound">
+          <svg id="iconSoundOn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+          <svg id="iconSoundOff" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
+        </button>
+        <button id="btnLevels" class="icon-btn" title="Select Level / Modes" aria-label="Select Level">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+        </button>
+        <button id="btnSettings" class="icon-btn" title="Settings & Themes" aria-label="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Game HUD: Stats & Indicators -->
+    <section class="game-hud">
+      <div class="hud-card level-badge-card">
+        <span class="hud-label">STAGE</span>
+        <span class="hud-value" id="hudLevelNumber">01</span>
+      </div>
+
+      <div class="hud-card moves-card">
+        <span class="hud-label">REMAINING</span>
+        <div class="hud-value-group">
+          <span class="hud-value" id="hudRemainingArrows">0</span>
+          <span class="hud-unit">/ <span id="hudTotalArrows">0</span></span>
+        </div>
+      </div>
+
+      <div class="hud-card timer-card">
+        <span class="hud-label" id="hudTimerLabel">TIME</span>
+        <span class="hud-value font-mono" id="hudTimer">00:00</span>
+      </div>
+
+      <div class="hud-card combo-card" id="hudComboContainer">
+        <span class="hud-label">COMBO</span>
+        <span class="hud-value combo-badge" id="hudCombo">x1</span>
+      </div>
+    </section>
+
+    <!-- Main Game Board Stage -->
+    <main class="game-stage">
+      <div class="board-frame" id="boardFrame">
+        <!-- Floating directional indicators around border -->
+        <div class="board-boundary top-bound"></div>
+        <div class="board-boundary right-bound"></div>
+        <div class="board-boundary bottom-bound"></div>
+        <div class="board-boundary left-bound"></div>
+
+        <!-- The Arrow Grid Container -->
+        <div id="gameBoard" class="game-board">
+          <!-- Dynamically populated cells with directional arrows -->
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom Controls Toolbar -->
+    <footer class="game-controls">
+      <button id="btnUndo" class="control-btn" title="Undo Move (Z)" aria-label="Undo Move">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 7v6h6"></path>
+          <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path>
+        </svg>
+        <span>Undo</span>
+      </button>
+
+      <button id="btnHint" class="control-btn hint-btn" title="Get Hint (H)" aria-label="Get Hint">
+        <div class="btn-glow"></div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18h6"></path>
+          <path d="M10 22h4"></path>
+          <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"></path>
+        </svg>
+        <span>Hint</span>
+        <span class="badge-count" id="hintBadge">3</span>
+      </button>
+
+      <button id="btnReset" class="control-btn" title="Restart Level (R)" aria-label="Restart Level">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21.5 2v6h-6"></path>
+          <path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+        </svg>
+        <span>Reset</span>
+      </button>
+    </footer>
+  </div>
+
+  <!-- Level Complete / Victory Modal -->
+  <div id="victoryModal" class="modal-overlay hidden">
+    <div class="modal-card victory-card">
+      <div class="victory-header">
+        <div class="star-rating" id="victoryStars">
+          <span class="star-icon star-active">★</span>
+          <span class="star-icon star-active">★</span>
+          <span class="star-icon star-active">★</span>
+        </div>
+        <h2 class="victory-title">STAGE CLEARED!</h2>
+        <p class="victory-subtitle" id="victorySubtitle">Brilliant logic and perfect timing!</p>
+      </div>
+
+      <div class="victory-stats-grid">
+        <div class="stat-box">
+          <span class="stat-label">TIME</span>
+          <span class="stat-value font-mono" id="victoryTime">00:24</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">MOVES</span>
+          <span class="stat-value" id="victoryMoves">16</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">MAX COMBO</span>
+          <span class="stat-value combo-highlight" id="victoryCombo">x12</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">SCORE</span>
+          <span class="stat-value" id="victoryScore">2,850</span>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="btnVictoryReplay" class="btn btn-secondary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          Replay
+        </button>
+        <button id="btnVictoryNext" class="btn btn-primary">
+          Next Stage
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mode Selector & Levels Modal -->
+  <div id="levelsModal" class="modal-overlay hidden">
+    <div class="modal-card levels-card">
+      <div class="modal-header">
+        <h2 class="modal-title">GAME MODES & LEVELS</h2>
+        <button class="close-btn" id="btnCloseLevels" aria-label="Close">&times;</button>
+      </div>
+
+      <!-- Mode Tabs -->
+      <div class="tabs-nav">
+        <button class="tab-btn active" data-tab="campaign">Campaign</button>
+        <button class="tab-btn" data-tab="infinite">Infinite Generator</button>
+        <button class="tab-btn" data-tab="blitz">Time Blitz</button>
+        <button class="tab-btn" data-tab="editor">Level Editor</button>
+      </div>
+
+      <!-- Tab Content: Campaign -->
+      <div class="tab-content active" id="tabCampaign">
+        <div class="campaign-summary">
+          <span>Overall Stars: <strong id="totalStarsCount">0</strong> / 105</span>
+          <span>Levels Completed: <strong id="completedLevelsCount">0</strong> / 35</span>
+        </div>
+        <div class="levels-grid" id="levelsGridContainer">
+          <!-- Dynamically populated level cards -->
+        </div>
+      </div>
+
+      <!-- Tab Content: Infinite Generator -->
+      <div class="tab-content" id="tabInfinite">
+        <div class="generator-config">
+          <p class="config-desc">Generate procedurally verified, 100% solvable puzzles with custom board dimensions.</p>
+          <div class="grid-size-selector">
+            <button class="size-btn active" data-size="4">4 × 4 <span>Quick</span></button>
+            <button class="size-btn" data-size="5">5 × 5 <span>Balanced</span></button>
+            <button class="size-btn" data-size="6">6 × 6 <span>Tricky</span></button>
+            <button class="size-btn" data-size="7">7 × 7 <span>Master</span></button>
+          </div>
+          <button id="btnGenerateInfinite" class="btn btn-primary btn-large">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            Generate New Puzzle
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab Content: Time Blitz -->
+      <div class="tab-content" id="tabBlitz">
+        <div class="blitz-intro">
+          <div class="blitz-icon">⚡</div>
+          <h3>60-SECOND BLITZ</h3>
+          <p>Clear arrows as fast as possible! Every cleared board awards bonus seconds (+5s) and extends your streak multiplier. Can you top the high score?</p>
+          <div class="blitz-high-score">
+            <span>BEST BLITZ SCORE</span>
+            <strong id="blitzBestScore">0</strong>
+          </div>
+          <button id="btnStartBlitz" class="btn btn-primary btn-large">Start Blitz Rush</button>
+        </div>
+      </div>
+
+      <!-- Tab Content: Level Editor -->
+      <div class="tab-content" id="tabEditor">
+        <div class="editor-panel">
+          <div class="editor-controls-row">
+            <label>Grid:
+              <select id="editorGridSize">
+                <option value="4">4 × 4</option>
+                <option value="5" selected>5 × 5</option>
+                <option value="6">6 × 6</option>
+                <option value="7">7 × 7</option>
+              </select>
+            </label>
+            <button id="btnEditorClear" class="btn btn-secondary btn-sm">Clear Board</button>
+            <button id="btnEditorRandom" class="btn btn-secondary btn-sm">Fill Random</button>
+          </div>
+          <p class="editor-hint">Tap any cell to rotate arrow direction (UP → RIGHT → DOWN → LEFT → EMPTY). Right-click to clear.</p>
+          <div class="editor-board-wrapper">
+            <div id="editorBoard" class="game-board"></div>
+          </div>
+          <div class="editor-actions">
+            <button id="btnEditorTest" class="btn btn-primary">Play Test Level</button>
+            <button id="btnEditorExport" class="btn btn-secondary">Copy Level Code</button>
+            <button id="btnEditorImport" class="btn btn-secondary">Import Code</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings & Theme Modal -->
+  <div id="settingsModal" class="modal-overlay hidden">
+    <div class="modal-card settings-card">
+      <div class="modal-header">
+        <h2 class="modal-title">SETTINGS</h2>
+        <button class="close-btn" id="btnCloseSettings" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="settings-group">
+        <h3>VISUAL THEMES</h3>
+        <div class="theme-options">
+          <button class="theme-option active" data-theme="obsidian">
+            <div class="theme-preview obsidian-preview">
+              <span class="preview-dot dot-cyan"></span>
+              <span class="preview-dot dot-magenta"></span>
+            </div>
+            <span>Obsidian Neon</span>
+          </button>
+          <button class="theme-option" data-theme="zen">
+            <div class="theme-preview zen-preview">
+              <span class="preview-dot dot-matcha"></span>
+              <span class="preview-dot dot-sand"></span>
+            </div>
+            <span>Zen Garden</span>
+          </button>
+          <button class="theme-option" data-theme="vaporwave">
+            <div class="theme-preview vaporwave-preview">
+              <span class="preview-dot dot-purple"></span>
+              <span class="preview-dot dot-pink"></span>
+            </div>
+            <span>Vaporwave</span>
+          </button>
+          <button class="theme-option" data-theme="emerald">
+            <div class="theme-preview emerald-preview">
+              <span class="preview-dot dot-green"></span>
+              <span class="preview-dot dot-dark"></span>
+            </div>
+            <span>Matrix Emerald</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <h3>AUDIO & EFFECTS</h3>
+        <div class="setting-row">
+          <label for="sliderSfxVolume">Sound Effects Volume</label>
+          <input type="range" id="sliderSfxVolume" min="0" max="100" value="80">
+        </div>
+        <div class="setting-row">
+          <label for="toggleAmbientMusic">Relaxing Ambient Drone</label>
+          <input type="checkbox" id="toggleAmbientMusic" class="switch-input">
+        </div>
+        <div class="setting-row">
+          <label for="toggleScreenShake">Screen Shake & Recoil</label>
+          <input type="checkbox" id="toggleScreenShake" class="switch-input" checked>
+        </div>
+        <div class="setting-row">
+          <label for="toggleParticles">Particle Trails & Confetti</label>
+          <input type="checkbox" id="toggleParticles" class="switch-input" checked>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <h3>HOW TO PLAY</h3>
+        <p class="help-text">
+          • <strong>Objective:</strong> Clear the entire board by setting every arrow free.<br>
+          • <strong>Rule:</strong> An arrow can only fly away if there are no other arrows blocking its flight path to the edge of the board.<br>
+          • <strong>Combos:</strong> Clear arrows consecutively without bumping into obstacles to build up musical combo streaks and high scores!
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="audio.js"></script>
+  <script src="particles.js"></script>
+  <script src="levels.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
