@@ -1,10 +1,10 @@
-﻿# 🎯 ARROWS: Puzzle Escape
+# ?? ARROWS: Puzzle Escape
 
 A sleek, tactile "Tap-Away" logic puzzle game built with modern web standards, physical raycasting collision mechanics, Web Audio synthesizers, and canvas particle engines.
 
 ---
 
-## 🎮 Gameplay & Features
+## ?? Gameplay & Features
 
 - **Directional Raycasting Physics**: Each arrow scans its line of sight. Unblocked arrows fly off the board with particle trails and ascending harmonic chimes; blocked arrows bump and recoil with mallet bonk sound effects and spark bursts.
 - **Dynamic Combo Multipliers**: Build consecutive escape streaks (x1, x2, x3...) to multiply your scores and scale chime pitches.
@@ -13,16 +13,16 @@ A sleek, tactile "Tap-Away" logic puzzle game built with modern web standards, p
 - **60-Second Blitz Mode**: High-intensity rush mode where every cleared board awards +5 bonus seconds and multiplier points.
 - **Interactive Level Editor**: Create custom boards, test them instantly with one click, and export/import puzzles via base64 codes.
 - **4 Rich Visual Themes**:
-  - 🌌 **Obsidian Noir**: Dark glassmorphism with electric violet accents.
-  - 🍵 **Zen Garden**: Calming slate, jade green, and earthen minimalism.
-  - 🌆 **Vaporwave Neon**: Retro 80s magenta, cyan, and vibrant gradients.
-  - 📟 **Matrix Cyberpunk**: Terminal dark theme with emerald luminescence.
+  - ?? **Obsidian Noir**: Dark glassmorphism with electric violet accents.
+  - ?? **Zen Garden**: Calming slate, jade green, and earthen minimalism.
+  - ?? **Vaporwave Neon**: Retro 80s magenta, cyan, and vibrant gradients.
+  - ?? **Matrix Cyberpunk**: Terminal dark theme with emerald luminescence.
 - **Zero-Dependency Sound Synthesizer**: Procedural Web Audio engine producing whooshes, pentatonic chimes, mallet bonks, victory fanfare, and optional ambient drone pad.
 - **HTML5 Canvas Particle Engine**: Interactive motes, laser flight trails, collision sparks, and dual-cannon victory confetti.
 
 ---
 
-## 🚀 How to Play
+## ?? How to Play
 
 ### Local Setup
 No build tools or npm dependencies required:
@@ -36,7 +36,7 @@ No build tools or npm dependencies required:
 
 ---
 
-## ⌨️ Controls
+## ?? Controls
 
 | Key / Action | Function |
 | :--- | :--- |
@@ -49,5 +49,5 @@ No build tools or npm dependencies required:
 
 ---
 
-## 📜 License
-MIT License. Created with ❤️.
+## ?? License
+MIT License. Created with ??.

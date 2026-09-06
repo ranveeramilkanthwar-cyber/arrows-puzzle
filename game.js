@@ -985,4 +985,18 @@ class ArrowsGame {
 // Instantiate and start game once DOM is loaded
 window.addEventListener('DOMContentLoaded', () => {
   window.game = new ArrowsGame();
+  
+  // Login Gate Logic
+  const loginGate = document.getElementById('loginGate');
+  const btnLogin = document.getElementById('btnLogin');
+  const loginPasscode = document.getElementById('loginPasscode');
+  const loginError = document.getElementById('loginError');
+
+  btnLogin.addEventListener('click', () => {
+    if (loginPasscode.value === 'admin') {
+      loginGate.classList.add('hidden');
+    } else {
+      loginError.classList.remove('hidden');
+    }
+  });
 });
